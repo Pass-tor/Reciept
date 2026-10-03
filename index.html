@@ -1,195 +1,909 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head><meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<meta name="theme-color" content="#0f172a"/>
-<title>Pautang - Offline Loan Manager</title>
-<link rel="manifest" href="manifest.json"/>
-<link rel="icon" href="icon-192.png"/>
-<link rel="apple-touch-icon" href="icon-192.png"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="mobile-web-app-capable" content="yes"/>
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>GCash Express Send Receipt</title>
+<meta name="theme-color" content="#1B5EE3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="GCash Receipt">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="manifest" href="./manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
 <style>
-:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--muted:#64748b;--primary:#0f172a;--accent:#4f46e5;--border:#e2e8f0}
-*{box-sizing:border-box;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-body{margin:0;background:var(--bg);color:var(--text);padding-bottom:90px}
-.header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
-.logo{font-weight:900;font-size:18px}
-.logo span{color:var(--accent)}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:12px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat-l{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:.6px}
-.stat-v{font-size:20px;font-weight:800;margin-top:4px}
-.btn{border:0;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer;display:inline-flex;justify-content:center;gap:6px}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-accent{background:var(--accent);color:#fff}
-.btn-ghost{background:#f1f5f9;color:var(--text)}
-.btn-sm{padding:8px 10px;font-size:13px;border-radius:10px}
-.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:30}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer}
-.nav-item.active{color:var(--accent)}
-.nav-icon{font-size:20px}
-.input{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;font-size:15px;background:#fff}
-.label{font-size:11px;font-weight:700;color:var(--muted);margin:10px 0 5px;display:block;text-transform:uppercase}
-.badge{padding:3px 8px;border-radius:99px;font-size:10px;font-weight:800;display:inline-block}
-.badge-paid{background:#dcfce7;color:#166534}.badge-overdue{background:#fee2e2;color:#991b1b}.badge-due{background:#dbeafe;color:#1e40af}.badge-up{background:#f1f5f9;color:#475569}.badge-part{background:#fef3c7;color:#92400e}
-.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(6px);z-index:50;display:flex;align-items:flex-end;justify-content:center;padding:12px}
-.modal{width:100%;max-width:520px;background:#fff;border-radius:20px 20px 0 0;max-height:85vh;max-height:85dvh;overflow:auto;padding:18px;padding-bottom:40vh;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
-.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.15);scroll-margin-bottom:120px}
-textarea.input:focus{scroll-margin-bottom:160px}
-.pin-screen{position:fixed;inset:0;background:#0f172a;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;padding:24px}
-.keypad{display:grid;grid-template-columns:repeat(3,80px);gap:14px;margin-top:24px}
-.key{width:80px;height:80px;border-radius:50%;background:#1e293b;color:#fff;font-size:22px;font-weight:800;border:0}
-.hr{border:0;border-top:1px dashed #cbd5e1;margin:12px 0}
-table{width:100%;border-collapse:collapse}
-th{font-size:11px;color:var(--muted);text-align:left;padding:8px 4px;border-bottom:1px solid var(--border)}
-td{padding:8px 4px;border-bottom:1px solid #f1f5f9;font-size:13px}
-.toast{position:fixed;left:12px;right:12px;bottom:84px;z-index:90;background:#0f172a;color:#fff;padding:12px 14px;border-radius:12px;font-size:13px;font-weight:700;text-align:center}
-.btn:focus-visible,.key:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+  /* PWA + Font Lock - hindi mababago ang font */
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=block');
+
+  
+  /* FONT LOCK - bawal mabago */
+  html {
+    font-family: var(--font) !important;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body, .app, .receipt, .receipt * , .viewer * {
+    font-family: var(--font) !important;
+    font-synthesis: none !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* Prevent system font override on mobile */
+  input, button { font-family: var(--font) !important; }
+
+  :root {
+    --blue: #1B5EE3;
+    --dark-blue: #0A2E73;
+    --text-blue: #173D82;
+    --muted: #9098A5;
+    --pale: #F0F4FF;
+    --line: #E8ECF2;
+    --font: Nunito, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100%;
+    height: 100%;
+  }
+
+  body {
+    background: var(--pale);
+    color: var(--text-blue);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  button, input { font: inherit; }
+  button { -webkit-tap-highlight-color: transparent; }
+
+  .app {
+    min-height: 100dvh;
+    background: var(--pale);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-panel {
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    padding: 16px 16px 12px;
+    flex: none;
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--blue);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+
+  .brand-mark svg { width: 18px; height: 18px; }
+
+  .brand-title {
+    color: var(--dark-blue);
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .brand-subtitle {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  .fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 12px;
+  }
+
+  .field {
+    margin-bottom: 10px;
+    min-width: 0;
+  }
+
+  .field.full { grid-column: 1 / -1; }
+
+  .field label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .field input {
+    width: 100%;
+    height: 44px;
+    padding: 10px 12px;
+    border: 1.5px solid #D1D9E8;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    color: var(--text-blue);
+    font-size: 16px;
+    font-weight: 600;
+    transition: border-color .15s;
+  }
+
+  .field input::placeholder {
+    color: #A5AFBE;
+    opacity: 1;
+  }
+
+  .field input:focus { border-color: var(--blue); }
+
+  .preview-area {
+    flex: 1;
+    min-height: 0;
+    padding: 14px 12px 20px;
+    background: var(--blue);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .toolbar {
+    width: 100%;
+    max-width: 390px;
+    height: 36px;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: none;
+  }
+
+  .toolbar-label {
+    color: rgba(255,255,255,.7);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .view-button {
+    border: 0;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    font-weight: 800;
+    min-height: 36px;
+    padding: 8px 16px;
+    background: #fff;
+    color: var(--blue);
+    font-size: 13px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+
+  .view-button svg {
+    width: 14px;
+    height: 14px;
+    flex: none;
+  }
+
+  .receipt-stage {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px;
+  }
+
+  .receipt {
+    width: 100%;
+    max-width: 390px;
+    margin: 0 auto;
+    background: var(--blue);
+    border-radius: 20px;
+    overflow: hidden;
+    font-family: var(--font);
+    color: var(--text-blue);
+  }
+
+  .receipt-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 18px 16px;
+  }
+
+  .receipt-header-title {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  .receipt-close-mark {
+    position: absolute;
+    left: 12px;
+    top: 18px;
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .receipt-close-mark svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .check-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: -26px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .check-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    background: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,.18);
+  }
+
+  .check-badge svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .receipt-card {
+    margin: 0 12px;
+    padding: 40px 18px 0;
+    border-radius: 14px 14px 0 0;
+    background: #fff;
+  }
+
+  .recipient-name {
+    margin-bottom: 10px;
+    color: #0057D9;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: .01em;
+    text-align: center;
+    word-break: break-word;
+  }
+
+  .phone-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .phone-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: #EDF2FF;
+    color: #1546A3;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .sent-via {
+    margin-bottom: 20px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .divider {
+    height: 1px;
+    margin: 0 -18px 16px;
+    background: var(--line);
+  }
+
+  .amount-row, .total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .amount-row {
+    margin-bottom: 16px;
+    color: var(--text-blue);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .amount-value { font-weight: 800; }
+
+  .total-row {
+    margin-bottom: 0;
+    color: var(--text-blue);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .total-value {
+    color: var(--dark-blue);
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -.02em;
+  }
+
+  .receipt-lower {
+    margin: 16px -18px 0;
+    padding: 18px 18px 22px;
+    background: var(--pale);
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    color: #30486B;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .ref-row {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .ref-label {
+    color: #536273;
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .ref-value {
+    color: #223B68;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .date-value {
+    white-space: nowrap;
+    text-align: right;
+    font-size: 10px;
+  }
+
+  /* Blank area — pinapalitan ang dating ads */
+  .blank-area {
+    width: 100%;
+    height: 92px;
+    margin: 0 0 16px;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .eco-card {
+    position: relative;
+    margin: 0;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #BFF3D5;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(28,203,138,.25);
+  }
+
+  .eco-card:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 9px;
+    border-radius: 10px 0 0 10px;
+    background: #1CCB8A;
+  }
+
+  .eco-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 6px;
+    color: #1B7C4F;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .eco-title svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+  }
+
+  .eco-unit {
+    color: #2E7E5A;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .eco-copy {
+    margin: 0;
+    color: #2F6E58;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.55;
+  }
+
+  .zigzag-wrap {
+    height: 12px;
+    margin: 0 12px;
+    margin-top: -1px;
+    line-height: 0;
+  }
+
+  .zigzag-wrap svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .receipt-footer-space { height: 60px; }
+
+  /* Full-screen viewer */
+  .viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    background: rgba(0,0,0,.45);
+    animation: backdropIn .34s ease-out both;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .viewer.closing { animation: backdropOut .34s ease-in both; }
+
+  .viewer-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    max-height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 12px 24px;
+    background: var(--blue);
+    display: flex;
+    flex-direction: column;
+    animation: slideUp .34s cubic-bezier(.22,1,.36,1) both;
+  }
+
+  .viewer.closing .viewer-panel {
+    animation: slideDown .34s ease-in both;
+  }
+
+  .viewer-toolbar {
+    width: 100%;
+    max-width: 390px;
+    height: 36px;
+    margin: 0 auto 12px;
+    flex: none;
+    display: flex;
+    align-items: center;
+  }
+
+  .viewer-receipt-stage {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-bottom: 20px;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  @keyframes slideDown {
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
+  }
+
+  @keyframes backdropIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes backdropOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *:before, *:after {
+      animation-duration: .001ms !important;
+      transition-duration: .001ms !important;
+    }
+  }
+
+  /* Larger phones / small tablets */
+  @media (min-width: 480px) {
+    .form-panel { padding: 20px 20px 16px; }
+    .fields { grid-template-columns: 1fr 1fr; }
+    .field { margin-bottom: 12px; }
+    .receipt-card { margin: 0 14px; padding: 42px 22px 0; }
+    .divider { margin: 0 -22px 18px; }
+    .receipt-lower { margin: 18px -22px 0; padding: 20px 22px 24px; }
+    .zigzag-wrap { margin: 0 14px; margin-top: -1px; }
+  }
+
+  /* Very small screens */
+  @media (max-width: 360px) {
+    .recipient-name { font-size: 18px; }
+    .total-value { font-size: 20px; }
+    .receipt-card { padding: 36px 16px 0; }
+    .receipt-lower { padding: 16px 16px 20px; }
+    .blank-area { height: 76px; }
+  }
 </style>
 </head>
 <body>
-<div id="pinLock" class="pin-screen">
-  <div style="font-size:30px;font-weight:900">Pautang</div>
-  <div id="pinSub" style="opacity:.7;margin-top:6px;font-size:14px">Enter PIN</div>
-  <div id="pinDots" style="display:flex;gap:10px;margin-top:18px"><div style="width:14px;height:14px;border-radius:50%;border:2px solid #334155"></div><div style="width:14px;height:14px;border-radius:50%;border:2px solid #334155"></div><div style="width:14px;height:14px;border-radius:50%;border:2px solid #334155"></div><div style="width:14px;height:14px;border-radius:50%;border:2px solid #334155"></div></div>
-  <div class="keypad" id="keypad"></div>
-  <button onclick="forgotPin()" style="margin-top:14px;background:none;border:0;color:#94a3b8;font-size:12px;text-decoration:underline">Forgot PIN?</button><div style="margin-top:16px;font-size:11px;opacity:.35;text-align:center">100% Offline • Secure<br><span style="font-size:10px">Developed by Edwin Macatangay Perez</span></div>
+<div class="app" id="app">
+  <section class="form-panel" id="formPanel">
+    <div class="brand-row">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="white">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">GCash Receipt Generator</div>
+        <div class="brand-subtitle" id="syncText">Time syncs automatically</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field full">
+        <label for="name">Recipient Name</label>
+        <input id="name" type="text" placeholder="CHIBEE" autocomplete="off">
+      </div>
+      <div class="field full">
+        <label for="phone">Phone Number</label>
+        <input id="phone" type="text" placeholder="+63 000 000 0000" autocomplete="off" inputmode="tel">
+      </div>
+      <div class="field">
+        <label for="amount">Amount (₱)</label>
+        <input id="amount" type="text" placeholder="0.00" autocomplete="off" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="ref1">Ref No. Line 1</label>
+        <input id="ref1" type="text" value="4041 401" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="ref2">Ref No. Line 2</label>
+        <input id="ref2" type="text" value="222597" autocomplete="off">
+      </div>
+    </div>
+  </section>
+
+  <main class="preview-area" id="previewArea">
+    <div class="toolbar">
+      <span class="toolbar-label">Preview</span>
+      <button class="view-button" id="viewButton" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        View Receipt
+      </button>
+    </div>
+    <div class="receipt-stage" id="previewReceiptStage"></div>
+  </main>
 </div>
-<div class="header">
-  <div class="logo">Pautang</div>
-  <div style="display:flex;gap:8px"><select id="langSel" class="input" style="width:auto;padding:6px 10px;border-radius:99px;font-size:12px"><option value="en">English</option><option value="tl">Tagalog</option></select><button class="btn btn-ghost btn-sm" onclick="lockApp()">🔒</button></div>
-</div>
-<div id="app" style="padding:12px;max-width:520px;margin:0 auto"></div>
-<div class="bottom" id="bottomNav"></div>
-<div id="modalRoot"></div>
+
 <script>
-const T={
-en:{dashboard:"Dashboard",borrowers:"Borrowers",loans:"Loans",payments:"Payments",reports:"Reports",settings:"Settings",totalBorrowers:"Total Borrowers",activeLoans:"Active Loans",paidLoans:"Fully Paid",overdueLoans:"Overdue",principalReleased:"Principal Released",totalDue:"Total Amount Due",collected:"Total Collected",remaining:"Remaining Balance",todaysDue:"Today's Due",upcomingDue:"Upcoming (7d)",addBorrower:"Add Borrower",newLoan:"New Loan",recordPayment:"Record Payment",search:"Search...",save:"Save",cancel:"Cancel",delete:"Delete",name:"Full Name",address:"Address",phone:"Phone",notes:"Notes",idnum:"ID / Reference",borrower:"Borrower",principal:"Principal",markup:"Markup %",term:"Term (months)",startDate:"Start Date",firstDue:"First Due Date",freq:"Frequency",monthly:"Monthly",biweekly:"Bi-weekly",weekly:"Weekly",custom:"Custom",amount:"Amount",method:"Method",date:"Date",cash:"Cash",gcash:"GCash",bank:"Bank",other:"Other",confirmDelete:"Are you sure? This cannot be undone.",export:"Export Backup",import:"Import Backup",reset:"Reset All Data",lenderName:"Lender Name",smsBtn:"Send SMS Reminder",print:"Print",share:"Share"},
-tl:{dashboard:"Dashboard",borrowers:"Mga Nanghiram",loans:"Mga Pautang",payments:"Mga Bayad",reports:"Ulat",settings:"Settings",totalBorrowers:"Kabuuang Nanghiram",activeLoans:"Aktibong Pautang",paidLoans:"Bayad Na",overdueLoans:"Overdue",principalReleased:"Nailabas na Puhunan",totalDue:"Kabuuang Singilin",collected:"Nakolekta",remaining:"Natitirang Balanse",todaysDue:"Due Ngayon",upcomingDue:"Parating (7d)",addBorrower:"Magdagdag",newLoan:"Bagong Pautang",recordPayment:"Magtala ng Bayad",search:"Maghanap...",save:"I-save",cancel:"Kanselahin",delete:"Burahin",name:"Buong Pangalan",address:"Address",phone:"Telepono",notes:"Tala",idnum:"ID",borrower:"Nanghiram",principal:"Puhunan",markup:"Tubo %",term:"Termino",startDate:"Simula",firstDue:"Unang Due",freq:"Dalas",monthly:"Buwanan",biweekly:"Kada 2 Linggo",weekly:"Lingguhan",custom:"Custom",amount:"Halaga",method:"Paraan",date:"Petsa",cash:"Cash",gcash:"GCash",bank:"Bangko",other:"Iba pa",confirmDelete:"Sigurado ka? Hindi na maibabalik.",export:"I-export",import:"I-import",reset:"Burahin Lahat",lenderName:"Pangalan",smsBtn:"SMS Paalala",print:"I-print",share:"I-share"}
-};
-let lang='en';function t(k){return (T[lang]&&T[lang][k])||T.en[k]||k}
-const DB_NAME='pautang_db',DB_VER=1;
-function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,DB_VER);r.onupgradeneeded=e=>{const db=e.target.result;['settings','borrowers','loans','installments','payments'].forEach(s=>{if(!db.objectStoreNames.contains(s))db.createObjectStore(s,{keyPath:'id'})})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
-async function idbGet(s,i){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(s,'readonly');const q=tx.objectStore(s).get(i);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)});}
-async function idbGetAll(s){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(s,'readonly');const q=tx.objectStore(s).getAll();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)});}
-async function idbPut(s,o){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(s,'readwrite');tx.objectStore(s).put(o);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)});}
-async function idbDelete(s,i){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(s,'readwrite');tx.objectStore(s).delete(i);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)});}
-async function idbClear(s){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(s,'readwrite');tx.objectStore(s).clear();tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)});}
-let settings={id:1,lenderName:'',lenderAddress:'',lenderPhone:'',lenderEmail:'',currency:'₱',defaultMarkup:10,defaultFreq:'monthly',defaultTerm:5,lang:'en',smsTemplate:'Hello {borrower}, this is a reminder from {lender}. Your payment of ₱{amount} is due on {date}. Thank you.',agreementTemplate:'LOAN AGREEMENT\nLender: {lenderName}\nBorrower: {borrowerName}\nPrincipal: {principal}\nMarkup: {markupPercent}% = {markupAmount}\nTotal: {totalDue}\nTerm: {term} months\nSchedule:\n{schedule}',loanCounter:1,receiptCounter:1};
-let borrowers=[],loans=[],installments=[],payments=[],currentTab='dashboard',pinInput='';
-async function loadAll(){let st=await idbGet('settings',1);if(st){settings={...settings,...st};lang=settings.lang||'en';document.getElementById('langSel').value=lang;}borrowers=await idbGetAll('borrowers')||[];loans=await idbGetAll('loans')||[];installments=await idbGetAll('installments')||[];payments=await idbGetAll('payments')||[];
-if(!settings.lenderName){document.getElementById('pinLock').style.display='none';showFirstSetup();return;}
-const code=await migrateSecurity();updateOverdues();render();if(code)showRecovery(code);
-if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}
-async function saveSettings(){settings.lang=lang;await idbPut('settings',settings);}
-function fmt(n){return settings.currency+' '+Number(n).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
-function calcLoan(p,perc,termM,freq){const principal=Number(p),per=Number(perc);const markupAmt=principal*(per/100);const total=principal+markupAmt;let count=termM;if(freq==='biweekly')count=termM*2;else if(freq==='weekly')count=termM*4;const base=Math.floor((total/count)*100)/100;let arr=[],sum=0;for(let i=0;i<count;i++){let amt=i===count-1?+(total-sum).toFixed(2):base;sum+=amt;arr.push(amt);}return{markupAmt,total,perInst:arr,count};}
-function addMonths(d,m){const dt=new Date(d),day=dt.getDate();dt.setDate(1);dt.setMonth(dt.getMonth()+m);dt.setDate(Math.min(day,new Date(dt.getFullYear(),dt.getMonth()+1,0).getDate()));return dt}
-function ymd(d){const z=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())}
-function esc(x){return String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function bcls(s){return {paid:'badge-paid',overdue:'badge-overdue',dueToday:'badge-due',partially:'badge-part'}[s]||'badge-up'}
-async function sha(x){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('pautang:'+x));return [...new Uint8Array(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}
-async function verifyPin(p){return !!p&&(await sha(p))===settings.pinHash}
-async function verifyRecovery(c){return !!c&&!!settings.recHash&&(await sha(c.trim().toUpperCase()))===settings.recHash}
-async function askPin(m){const p=prompt(m||'Enter PIN');return !!p&&await verifyPin(p)}
-function genCode(){return Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b%32]).join('')}
-async function migrateSecurity(){let ch=false,code=null;if(settings.pin&&!settings.pinHash){settings.pinHash=await sha(settings.pin);ch=true}if(!settings.pinHash){settings.pinHash=await sha('0000');ch=true}if('pin' in settings||'masterPin' in settings){delete settings.pin;delete settings.masterPin;ch=true}if(!settings.recHash){code=genCode();settings.recHash=await sha(code);ch=true}if(ch)await saveSettings();return code}
-function showRecovery(c){showModal(`<h3>Recovery code</h3><p style="font-size:13px;color:#64748b">Write this down. It is the only way to reset your PIN if you forget it. It will not be shown again.</p><div style="font-size:26px;font-weight:900;letter-spacing:3px;text-align:center;padding:14px;background:#f8fafc;border-radius:12px">${c}</div><button class="btn btn-primary" style="width:100%;margin-top:14px" onclick="closeModal()">I saved it</button>`)}
-function backupBanner(){if(!borrowers.length&&!loans.length)return '';const d=settings.lastBackup?Math.floor((Date.now()-settings.lastBackup)/864e5):null;if(d!==null&&d<14)return '';return `<div class="card" style="background:#fef3c7;border-color:#fde68a;font-size:12px">⚠️ ${d===null?'No backup yet.':'Last backup '+d+' days ago.'} Data is stored only on this device. <b onclick="exportData()" style="text-decoration:underline;cursor:pointer">Export now</b></div>`}
-async function purgeLoan(id){for(const i of installments.filter(i=>i.loanId===id))await idbDelete('installments',i.id);for(const p of payments.filter(p=>p.loanId===id))await idbDelete('payments',p.id);await idbDelete('loans',id);installments=installments.filter(i=>i.loanId!==id);payments=payments.filter(p=>p.loanId!==id);loans=loans.filter(l=>l.id!==id)}
-async function recalcLoan(id){const l=loans.find(x=>x.id===id);if(!l)return;const ps=payments.filter(p=>p.loanId===id).sort((a,b)=>new Date(a.paymentDate)-new Date(b.paymentDate));const paid=ps.reduce((n,p)=>n+Math.round(p.amount*100),0);let pool=paid;const ins=installments.filter(i=>i.loanId===id).sort((a,b)=>a.installmentNumber-b.installmentNumber);for(const i of ins){const ap=Math.min(Math.round(i.amountDue*100),pool);pool-=ap;i.amountPaid=ap/100;await idbPut('installments',i)}l.totalPaid=paid/100;l.remainingBalance=Math.max(0,Math.round(l.totalDue*100-paid)/100);l.status=l.remainingBalance<=0.01?'paid':'active';if(l.status==='paid')l.remainingBalance=0;await idbPut('loans',l)}
-function formatDate(d){return new Date(d).toLocaleDateString('en-PH',{year:'numeric',month:'short',day:'numeric'})}
-function updateOverdues(){const today=new Date();today.setHours(0,0,0,0);installments.forEach(ins=>{if(ins.amountPaid>=ins.amountDue-0.01){ins.status='paid';return;}const due=new Date(ins.dueDate);due.setHours(0,0,0,0);if(due.getTime()===today.getTime())ins.status=ins.amountPaid>0?'partially':'dueToday';else if(due<today)ins.status=ins.amountPaid>0?'partially':'overdue';else ins.status='upcoming';});loans.forEach(l=>{const ins=installments.filter(i=>i.loanId===l.id);const hasOver=ins.some(i=>i.status==='overdue');if(l.remainingBalance<=0.01){l.status='paid';l.remainingBalance=0}else if(hasOver)l.status='overdue';else if(l.status!=='paid')l.status='active';});}
-function lockApp(){document.getElementById('pinLock').style.display='flex';pinInput='';renderPin();}
-function renderPin(){const dots=document.getElementById('pinDots').children;for(let i=0;i<4;i++)dots[i].style.background=i<pinInput.length?'white':'transparent';}
-function initKeypad(){const kp=document.getElementById('keypad');kp.innerHTML='';[1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(k=>{const b=document.createElement('button');b.className='key';b.textContent=k;if(k==='')b.style.visibility='hidden';b.onclick=()=>{if(k==='⌫'){pinInput=pinInput.slice(0,-1);}else if(pinInput.length<4){pinInput+=k;if(pinInput.length===4)setTimeout(checkPin,150);}renderPin();};kp.appendChild(b);});}
-let fails=0,lockUntil=0;
-async function checkPin(){const sub=document.getElementById('pinSub');if(Date.now()<lockUntil){sub.textContent='Too many tries. Wait '+Math.ceil((lockUntil-Date.now())/1000)+'s';pinInput='';renderPin();return}
-if(await verifyPin(pinInput)){fails=0;document.getElementById('pinLock').style.display='none';pinInput='';renderPin();}else{if(++fails>=5){lockUntil=Date.now()+30000;fails=0}pinInput='';renderPin();sub.textContent='Maling PIN! Subukan ulit';setTimeout(()=>sub.textContent='Enter PIN',1500)}}
-function renderNav(){const tabs=[{k:'dashboard',i:'🏠',l:t('dashboard')},{k:'borrowers',i:'👥',l:t('borrowers')},{k:'loans',i:'💳',l:t('loans')},{k:'payments',i:'🧾',l:t('payments')},{k:'reports',i:'📊',l:t('reports')},{k:'settings',i:'⚙️',l:t('settings')}];document.getElementById('bottomNav').innerHTML=tabs.map(tb=>`<div class="nav-item ${currentTab===tb.k?'active':''}" onclick="switchTab('${tb.k}')"><div class="nav-icon">${tb.i}</div>${tb.l}</div>`).join('');}
-function switchTab(k){currentTab=k;render();}
-function render(){renderNav();const app=document.getElementById('app');if(!settings.lenderName&&currentTab!=='settings')return;if(currentTab==='dashboard')app.innerHTML=renderDash();else if(currentTab==='borrowers')app.innerHTML=renderBorrowers();else if(currentTab==='loans')app.innerHTML=renderLoans();else if(currentTab==='payments')app.innerHTML=renderPays();else if(currentTab==='reports')app.innerHTML=renderReports();else if(currentTab==='settings')app.innerHTML=renderSettings();}
-function renderDash(){const tb=borrowers.length;const active=loans.filter(l=>l.status==='active'||l.status==='overdue').length;const paid=loans.filter(l=>l.status==='paid').length;const over=loans.filter(l=>l.status==='overdue').length;const princ=loans.reduce((s,l)=>s+l.principal,0);const due=loans.reduce((s,l)=>s+l.totalDue,0);const coll=payments.reduce((s,p)=>s+p.amount,0);const rem=due-coll;const today=new Date().toDateString();const todays=installments.filter(i=>new Date(i.dueDate).toDateString()===today&&i.status!=='paid').reduce((s,i)=>s+(i.amountDue-i.amountPaid),0);const n7=new Date();n7.setDate(n7.getDate()+7);const up=installments.filter(i=>{const d=new Date(i.dueDate);return d>new Date()&&d<=n7&&i.status!=='paid'}).reduce((s,i)=>s+(i.amountDue-i.amountPaid),0);return backupBanner()+`<div class="grid2"><div class="card"><div class="stat-l">${t('totalBorrowers')}</div><div class="stat-v">${tb}</div></div><div class="card"><div class="stat-l">${t('activeLoans')}</div><div class="stat-v">${active}</div></div><div class="card"><div class="stat-l">${t('paidLoans')}</div><div class="stat-v">${paid}</div></div><div class="card" style="border-color:#fecaca"><div class="stat-l">${t('overdueLoans')}</div><div class="stat-v" style="color:#ef4444">${over}</div></div></div><div class="grid2"><div class="card"><div class="stat-l">${t('principalReleased')}</div><div class="stat-v" style="font-size:14px">${fmt(princ)}</div></div><div class="card"><div class="stat-l">${t('totalDue')}</div><div class="stat-v" style="font-size:14px">${fmt(due)}</div></div><div class="card"><div class="stat-l">${t('collected')}</div><div class="stat-v" style="font-size:14px;color:#16a34a">${fmt(coll)}</div></div><div class="card"><div class="stat-l">${t('remaining')}</div><div class="stat-v" style="font-size:14px">${fmt(rem)}</div></div><div class="card"><div class="stat-l">${t('todaysDue')}</div><div class="stat-v" style="font-size:14px">${fmt(todays)}</div></div><div class="card"><div class="stat-l">${t('upcomingDue')}</div><div class="stat-v" style="font-size:14px">${fmt(up)}</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><button class="btn btn-primary btn-sm" onclick="openBorrowerForm()">+ ${t('addBorrower')}</button><button class="btn btn-accent btn-sm" onclick="openLoanForm()">+ ${t('newLoan')}</button><button class="btn btn-ghost btn-sm" onclick="openPayForm()">+ ${t('recordPayment')}</button></div><div style="text-align:center;margin-top:18px;padding:10px;font-size:10px;color:#94a3b8;border-top:1px solid #e2e8f0">Developed by <b style="color:#0f172a">Edwin Macatangay Perez</b> • Pautang © 2026</div>`;}
-function borrowerRows(q){q=(q||'').toLowerCase();const list=borrowers.filter(b=>!q||b.fullName.toLowerCase().includes(q)||(b.phone||'').includes(q));return list.map(b=>{const bal=loans.filter(l=>l.borrowerId===b.id).reduce((s,l)=>s+l.remainingBalance,0);return `<div class="card" onclick="openBorrowerDetail('${b.id}')" style="cursor:pointer"><div style="display:flex;justify-content:space-between"><div><div style="font-weight:800">${esc(b.fullName)}</div><div style="font-size:12px;color:#64748b">${esc(b.phone)} • ${esc(b.address||'')}</div></div><div style="font-weight:700">${fmt(bal)}</div></div></div>`}).join('')||'<div style="text-align:center;color:#64748b;padding:24px">No borrowers</div>'}
-function filterBorrowers(){document.getElementById('bList').innerHTML=borrowerRows(document.getElementById('borrowerSearch').value)}
-function renderBorrowers(){return `<div style="display:flex;gap:8px;margin-bottom:12px"><input id="borrowerSearch" class="input" placeholder="${t('search')}" oninput="filterBorrowers()"/><button class="btn btn-primary" onclick="openBorrowerForm()">+</button></div><div id="bList">${borrowerRows('')}</div>`}
-function renderLoans(){const f=window.loanFilter||'all';let list=loans;if(f==='overdue')list=list.filter(l=>l.status==='overdue');else if(f==='paid')list=list.filter(l=>l.status==='paid');else if(f==='active')list=list.filter(l=>l.status==='active');return `<div style="display:flex;gap:6px;overflow:auto;margin-bottom:10px">${['all','active','paid','overdue'].map(x=>`<button class="btn ${f===x?'btn-primary':'btn-ghost'} btn-sm" onclick="window.loanFilter='${x}';render()">${x}</button>`).join('')}<button class="btn btn-primary btn-sm" onclick="openLoanForm()">+</button></div><div>${list.map(l=>{const b=borrowers.find(x=>x.id===l.borrowerId);return `<div class="card" onclick="openLoanDetail('${l.id}')" style="cursor:pointer"><div style="display:flex;justify-content:space-between"><div><div style="font-weight:800">${l.loanNumber}</div><div style="font-size:12px">${esc(b?b.fullName:'')} • ${fmt(l.principal)} @ ${l.markupPercent}%</div></div><div style="text-align:right"><span class="badge ${l.status==='paid'?'badge-paid':l.status==='overdue'?'badge-overdue':'badge-up'}">${l.status}</span><div style="font-weight:700;font-size:12px;margin-top:4px">${fmt(l.remainingBalance)}</div></div></div></div>`}).join('')||'<div style="text-align:center;color:#64748b;padding:24px">No loans</div>'}</div>`;}
-function renderPays(){let list=payments.slice().sort((a,b)=>new Date(b.paymentDate)-new Date(a.paymentDate));return `<div style="display:flex;gap:8px;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="openPayForm()">+ Payment</button></div><div>${list.map(p=>{const b=borrowers.find(x=>x.id===p.borrowerId);return `<div class="card"><div style="display:flex;justify-content:space-between"><div><b>${p.receiptNumber}</b> • ${fmt(p.amount)}<br><span style="font-size:12px">${esc(b?b.fullName:'')} • ${p.method}</span></div><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="viewReceipt('${p.id}')">🧾</button><button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="voidPay('${p.id}')">Void</button></div></div></div>`}).join('')||'No payments'}</div>`;}
-function renderReports(){const r=window.reportRange||'month';let start=new Date();if(r==='today')start.setHours(0,0,0,0);else if(r==='week')start.setDate(start.getDate()-7);else if(r==='month')start.setDate(1);else if(r==='year')start.setMonth(0,1);else start=new Date(2000,0,1);let fL=loans.filter(l=>new Date(l.createdAt||l.startDate)>=start);let fP=payments.filter(p=>new Date(p.paymentDate)>=start);return `<div style="display:flex;gap:6px;margin-bottom:12px">${['today','week','month','year','all'].map(x=>`<button class="btn ${r===x?'btn-primary':'btn-ghost'} btn-sm" onclick="window.reportRange='${x}';render()">${x}</button>`).join('')}</div><div class="grid2"><div class="card"><div class="stat-l">Loans</div><div class="stat-v">${fL.length}</div></div><div class="card"><div class="stat-l">Principal</div><div class="stat-v" style="font-size:14px">${fmt(fL.reduce((s,l)=>s+l.principal,0))}</div></div><div class="card"><div class="stat-l">Markup</div><div class="stat-v" style="font-size:14px">${fmt(fL.reduce((s,l)=>s+l.markupAmount,0))}</div></div><div class="card"><div class="stat-l">Due</div><div class="stat-v" style="font-size:14px">${fmt(fL.reduce((s,l)=>s+l.totalDue,0))}</div></div><div class="card"><div class="stat-l">Collected</div><div class="stat-v" style="font-size:14px;color:#16a34a">${fmt(fP.reduce((s,p)=>s+p.amount,0))}</div></div><div class="card"><div class="stat-l">Outstanding</div><div class="stat-v" style="font-size:14px">${fmt(fL.reduce((s,l)=>s+l.remainingBalance,0))}</div></div></div>`;}
-function renderSettings(){return `<div class="card"><div style="font-weight:800">👤 Profile</div><label class="label">Lender Name</label><input id="sName" class="input" value="${esc(settings.lenderName)}"/><label class="label">Address</label><input id="sAddr" class="input" value="${esc(settings.lenderAddress)}"/><label class="label">Phone</label><input id="sPhone" class="input" value="${esc(settings.lenderPhone)}"/><button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="saveProfile()">Save</button></div><div class="card"><div style="font-weight:800">🔒 Security</div><input id="oldPin" class="input" placeholder="Current PIN" type="password" maxlength="4" style="margin-top:8px"/><input id="newPin" class="input" placeholder="New PIN 4 digits" type="password" maxlength="4" style="margin-top:6px"/><button class="btn btn-ghost" style="width:100%;margin-top:6px" onclick="changePin()">Change PIN</button><div class="hr"></div><button class="btn btn-ghost" style="width:100%" onclick="newRecovery()">🔑 New recovery code</button></div><div class="card"><div style="font-weight:800">💾 Data</div><button class="btn btn-accent" style="width:100%;margin-top:8px" onclick="exportData()">📤 ${t('export')}</button><label class="btn btn-ghost" style="width:100%;margin-top:8px"><input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"/>📥 ${t('import')}</label><button class="btn" style="width:100%;margin-top:8px;background:#fee2e2;color:#991b1b" onclick="resetAll()">🗑️ ${t('reset')}</button><button id="installBtn" class="btn btn-primary" style="width:100%;margin-top:8px;display:${_dip?'block':'none'}" onclick="installApp()">📲 Install app</button><div style="font-size:11px;color:#64748b;margin-top:10px;text-align:center">100% Offline • Secure • PWA<br><span style="font-weight:700;color:#0f172a">Developed by Edwin Macatangay Perez</span><br>© 2026 Pautang</div></div>`;}
-function showModal(h){document.getElementById('modalRoot').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">${h}</div></div>`}
-function closeModal(){document.getElementById('modalRoot').innerHTML=''}
-function showFirstSetup(){showModal(`<h3>Welcome</h3><p style="font-size:13px;color:#64748b">Setup lender (offline)</p><label class="label">Lender Name *</label><input id="fName" class="input"/><label class="label">Address</label><input id="fAddr" class="input"/><label class="label">Phone *</label><input id="fPhone" class="input"/><label class="label">Choose 4-digit PIN *</label><input id="fPin" class="input" type="password" inputmode="numeric" maxlength="4"/><button class="btn btn-primary" style="width:100%;margin-top:14px" onclick="doFirstSetup()">Continue</button>`);}
-async function doFirstSetup(){const n=document.getElementById('fName').value.trim(),p=document.getElementById('fPhone').value.trim(),pin=document.getElementById('fPin').value;if(!n||!p){alert('Required');return;}if(!/^\d{4}$/.test(pin)){alert('PIN must be 4 digits');return;}settings.lenderName=n;settings.lenderAddress=document.getElementById('fAddr').value;settings.lenderPhone=p;settings.pinHash=await sha(pin);const code=genCode();settings.recHash=await sha(code);await saveSettings();render();showRecovery(code);}
-function openBorrowerForm(id){const b=id?borrowers.find(x=>x.id===id):null;showModal(`<h3>${b?'Edit':'Add'} Borrower</h3><label class="label">${t('name')} *</label><input id="bName" class="input" value="${esc(b?b.fullName:'')}"/><label class="label">${t('address')}</label><input id="bAddr" class="input" value="${esc(b?b.address:'')}"/><label class="label">${t('phone')} *</label><input id="bPhone" class="input" value="${esc(b?b.phone:'')}"/><div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-ghost" style="flex:1" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" style="flex:1" onclick="saveBorrower('${id||''}')">Save</button></div>`);}
-async function saveBorrower(id){const name=document.getElementById('bName').value.trim(),phone=document.getElementById('bPhone').value.trim();if(!name||!phone){alert('Required');return;}let obj=id?borrowers.find(x=>x.id===id):{id:uid(),createdAt:new Date().toISOString()};obj.fullName=name;obj.address=document.getElementById('bAddr').value;obj.phone=phone;await idbPut('borrowers',obj);if(!id)borrowers.push(obj);closeModal();render();}
-function openBorrowerDetail(id){const b=borrowers.find(x=>x.id===id);const bl=loans.filter(l=>l.borrowerId===id);showModal(`<h3>${esc(b.fullName)}</h3><div style="font-size:12px;color:#64748b">${esc(b.phone)}</div><div style="display:flex;gap:6px;margin:10px 0"><button class="btn btn-primary btn-sm" onclick="closeModal();openLoanForm('${id}')">+ Loan</button><button class="btn btn-ghost btn-sm" onclick="openBorrowerForm('${id}')">Edit</button><button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteBorrower('${id}')">Delete</button></div>${bl.map(l=>`<div class="card" onclick="closeModal();openLoanDetail('${l.id}')"><b>${l.loanNumber}</b> - ${fmt(l.remainingBalance)} <span class="badge badge-up">${l.status}</span></div>`).join('')||'No loans'}`);}
-async function deleteBorrower(id){if(!confirm(t('confirmDelete')))return;if(loans.some(l=>l.borrowerId===id&&l.status!=='paid')){alert('May active loan pa');return;}if(!(await askPin('Ilagay ang PIN para burahin ang borrower:'))){alert('Maling PIN');return;}for(const l of loans.filter(l=>l.borrowerId===id))await purgeLoan(l.id);await idbDelete('borrowers',id);borrowers=borrowers.filter(x=>x.id!==id);closeModal();render();}
-function openLoanForm(pref){const opts=borrowers.map(b=>`<option value="${b.id}" ${pref===b.id?'selected':''}>${esc(b.fullName)}</option>`).join('');showModal(`<h3>New Loan</h3><label class="label">Borrower</label><select id="lBorrower" class="input">${opts||'<option value="">No borrowers</option>'}</select><label class="label">Principal *</label><input id="lPrincipal" class="input" type="number" oninput="calcPreview()"/><label class="label">Markup %</label><input id="lMarkup" class="input" type="number" value="${settings.defaultMarkup}" oninput="calcPreview()"/><label class="label">Term (months)</label><select id="lTerm" class="input" onchange="calcPreview()">${[1,2,3,4,5,6,7,8,9,10,11,12].map(n=>`<option value="${n}" ${n===5?'selected':''}>${n}</option>`).join('')}</select><label class="label">Frequency</label><select id="lFreq" class="input"><option value="monthly">Monthly</option><option value="biweekly">Bi-weekly</option><option value="weekly">Weekly</option></select><label class="label">First Due</label><input id="lDue" class="input" type="date" value="${ymd(addMonths(new Date(),1))}"/><div id="calcPreview" class="card" style="margin-top:10px;background:#f8fafc"></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn btn-primary" style="flex:1" onclick="saveLoan()">Save</button></div>`);window.calcPreview=()=>{const p=Number(document.getElementById('lPrincipal').value)||0,m=Number(document.getElementById('lMarkup').value)||0,t=Number(document.getElementById('lTerm').value);const f=document.getElementById('lFreq').value;if(p<=0||t<=0){document.getElementById('calcPreview').innerHTML='Enter principal';return;}const c=calcLoan(p,m,t,f);document.getElementById('calcPreview').innerHTML=`Total: <b>${fmt(c.total)}</b><br>Markup: ${fmt(c.markupAmt)}<br>${c.count} x ${fmt(c.perInst[0])}`;};calcPreview();}
-async function saveLoan(){const bId=document.getElementById('lBorrower').value;if(!bId){alert('Select borrower');return;}const p=Number(document.getElementById('lPrincipal').value);if(p<=0){alert('Invalid');return;}const m=Number(document.getElementById('lMarkup').value);const term=Number(document.getElementById('lTerm').value);const freq=document.getElementById('lFreq').value;const c=calcLoan(p,m,term,freq);const ln=`LN-${new Date().getFullYear()}-${String(settings.loanCounter).padStart(4,'0')}`;settings.loanCounter++;await saveSettings();const loan={id:uid(),loanNumber:ln,borrowerId:bId,principal:p,markupPercent:m,markupAmount:c.markupAmt,totalDue:c.total,termMonths:term,frequency:freq,startDate:new Date().toISOString(),firstDueDate:document.getElementById('lDue').value,status:'active',totalPaid:0,remainingBalance:c.total,createdAt:new Date().toISOString()};await idbPut('loans',loan);loans.push(loan);let base=new Date(document.getElementById('lDue').value);for(let i=0;i<c.count;i++){let d=new Date(base);if(freq==='monthly')d=addMonths(base,i);else if(freq==='biweekly'){d=new Date(base);d.setDate(d.getDate()+i*14);}else if(freq==='weekly'){d=new Date(base);d.setDate(d.getDate()+i*7);}const ins={id:uid(),loanId:loan.id,installmentNumber:i+1,dueDate:d.toISOString(),amountDue:c.perInst[i],amountPaid:0,status:'upcoming'};await idbPut('installments',ins);installments.push(ins);}closeModal();updateOverdues();render();openLoanDetail(loan.id);}
-function openLoanDetail(id){const l=loans.find(x=>x.id===id);const b=borrowers.find(x=>x.id===l.borrowerId);const ins=installments.filter(i=>i.loanId===id).sort((a,b)=>a.installmentNumber-b.installmentNumber);const pays=payments.filter(p=>p.loanId===id);showModal(`<div style="display:flex;justify-content:space-between"><h3 style="margin:0">${l.loanNumber}</h3><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div style="font-size:12px">${esc(b?b.fullName:'')} • ${fmt(l.principal)} @ ${l.markupPercent}%</div><div class="grid2" style="margin-top:10px"><div class="card" style="margin:0"><div class="stat-l">Due</div><div style="font-weight:800">${fmt(l.totalDue)}</div></div><div class="card" style="margin:0"><div class="stat-l">Balance</div><div style="font-weight:800">${fmt(l.remainingBalance)}</div></div></div><div style="display:flex;gap:6px;margin:10px 0"><button class="btn btn-primary btn-sm" onclick="openPayForm('${l.borrowerId}','${l.id}')">💰 Pay</button><button class="btn btn-accent btn-sm" onclick="smsLoan('${l.id}')">💬 SMS</button><button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteLoan('${l.id}')">Delete</button></div><h4>Schedule</h4><table><tr><th>#</th><th>Due</th><th>Amount</th><th>Status</th></tr>${ins.map(i=>`<tr><td>${i.installmentNumber}</td><td>${formatDate(i.dueDate)}</td><td>${fmt(i.amountDue)}</td><td><span class="badge ${bcls(i.status)}">${i.status}</span></td></tr>`).join('')}</table><h4>Payments</h4>${pays.map(p=>`<div class="card"><b>${p.receiptNumber}</b> ${fmt(p.amount)} <button class="btn btn-ghost btn-sm" onclick="viewReceipt('${p.id}')">Receipt</button></div>`).join('')||'None'}`);}
-async function deleteLoan(id){if(!confirm(t('confirmDelete')))return;if(payments.some(p=>p.loanId===id)&&!(await askPin('Loan has payments. Enter PIN to delete:'))){alert('Maling PIN');return;}await purgeLoan(id);closeModal();render();}
-function openPayForm(pb,pl){const act=loans.filter(l=>l.status!=='paid');if(!act.length){alert('No active loans');return;}const bs=borrowers.filter(b=>act.some(l=>l.borrowerId===b.id));if(!bs.some(b=>b.id===pb))pb=bs[0].id;const ol=b=>act.filter(l=>l.borrowerId===b).map(l=>`<option value="${l.id}" ${pl===l.id?'selected':''}>${l.loanNumber} Bal ${fmt(l.remainingBalance)}</option>`).join('');showModal(`<h3>Payment</h3><select id="pBorrower" class="input" onchange="filterLoans()">${bs.map(b=>`<option value="${b.id}" ${pb===b.id?'selected':''}>${esc(b.fullName)}</option>`).join('')}</select><select id="pLoan" class="input" style="margin-top:6px">${ol(pb)}</select><input id="pAmount" class="input" type="number" inputmode="decimal" placeholder="Amount" style="margin-top:6px"/><input id="pDate" class="input" type="date" value="${ymd(new Date())}" style="margin-top:6px"/><select id="pMethod" class="input" style="margin-top:6px"><option value="cash">Cash</option><option value="gcash">GCash</option><option value="bank">Bank</option><option value="other">Other</option></select><div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn btn-primary" style="flex:1" onclick="savePay()">Save</button></div>`);window.filterLoans=()=>{document.getElementById('pLoan').innerHTML=ol(document.getElementById('pBorrower').value)};}
-async function savePay(){const loanId=document.getElementById('pLoan').value;const amt=Math.round(Number(document.getElementById('pAmount').value)*100)/100;const loan=loans.find(x=>x.id===loanId);if(!loan||!(amt>0)){alert('Invalid');return;}if(amt>loan.remainingBalance+0.005){alert('Amount exceeds balance: '+fmt(loan.remainingBalance));return;}const d=document.getElementById('pDate').value;const prev=loan.remainingBalance;const rc=`OR-${new Date().getFullYear()}-${String(settings.receiptCounter).padStart(4,'0')}`;settings.receiptCounter++;await saveSettings();const pay={id:uid(),receiptNumber:rc,loanId,borrowerId:loan.borrowerId,paymentDate:(d?new Date(d+'T12:00:00'):new Date()).toISOString(),amount:amt,method:document.getElementById('pMethod').value,previousBalance:prev,remainingBalance:0};payments.push(pay);await recalcLoan(loanId);pay.remainingBalance=loan.remainingBalance;await idbPut('payments',pay);closeModal();updateOverdues();render();viewReceipt(pay.id);}
-async function voidPay(id){const p=payments.find(x=>x.id===id);if(!p||!confirm('Void '+p.receiptNumber+'? Balance will be restored.'))return;if(!(await askPin('Enter PIN to void payment'))){alert('Maling PIN');return;}await idbDelete('payments',id);payments=payments.filter(x=>x.id!==id);await recalcLoan(p.loanId);updateOverdues();closeModal();render();}
-function viewReceipt(id){
-const p=payments.find(x=>x.id===id);const l=loans.find(x=>x.id===p.loanId);const b=borrowers.find(x=>x.id===p.borrowerId);
-const textCopy = `RESIBO - ${settings.lenderName}\n${settings.lenderAddress}\n${settings.lenderPhone}\n\nReceipt: ${p.receiptNumber}\nDate: ${formatDate(p.paymentDate)}\nLoan: ${l?l.loanNumber:''}\nBorrower: ${b?b.fullName:''} (${b?b.phone:''})\n\nBinayad: ${fmt(p.amount)}\nParaan: ${p.method}\nDating Balanse: ${fmt(p.previousBalance)}\nNatitira: ${fmt(p.remainingBalance)}\n\nSalamat! - ${settings.lenderName}`;
-showModal(`<div id="receiptCopy" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;font-size:13px;line-height:1.6;white-space:pre-wrap">${esc(textCopy)}</div><div style="font-size:11px;color:#64748b;margin-top:8px;text-align:center">Receipt copy para kay borrower - pwede i-SMS o i-share</div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-accent" style="flex:1" onclick="smsReceipt('${p.id}')">💬 I-SMS kay Borrower</button><button class="btn btn-primary" style="flex:1" onclick="shareReceiptCopy('${p.id}')">📤 I-Share / Kopya</button></div><div style="margin-top:10px;text-align:center;font-size:10px;color:#94a3b8">Developed by Edwin Macatangay Perez</div>`);
-window._lastReceiptText=textCopy;
-}
-function shareReceiptCopy(id){
-const txt=window._lastReceiptText||'Receipt';
-if(navigator.share){navigator.share({title:'Resibo - '+settings.lenderName,text:txt});}
-else{navigator.clipboard.writeText(txt).then(()=>alert('Na-kopya! Pwede mo na i-paste kay borrower'));}}
-function smsReceipt(id){
-const p=payments.find(x=>x.id===id);const b=borrowers.find(x=>x.id===p.borrowerId);
-const txt=window._lastReceiptText||'';
-if(!b||!b.phone){alert('Walang phone number si borrower');return;}
-window.location.href=`sms:${b.phone}?body=${encodeURIComponent(txt)}`;
-}
-function smsLoan(id){const l=loans.find(x=>x.id===id);const b=borrowers.find(x=>x.id===l.borrowerId);const next=installments.filter(i=>i.loanId===id&&i.status!=='paid').sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate))[0];const amt=next?fmt(next.amountDue-next.amountPaid):fmt(l.remainingBalance);const msg=settings.smsTemplate.replace('{borrower}',b.fullName).replace('{lender}',settings.lenderName).replace('{amount}',amt).replace('{date}',next?formatDate(next.dueDate):'').replace('{loanNumber}',l.loanNumber);window.location.href=`sms:${b.phone}?body=${encodeURIComponent(msg)}`;}
-async function saveProfile(){settings.lenderName=document.getElementById('sName').value;settings.lenderAddress=document.getElementById('sAddr').value;settings.lenderPhone=document.getElementById('sPhone').value;await saveSettings();alert('Saved');render();}
-async function changePin(){const o=document.getElementById('oldPin').value,n=document.getElementById('newPin').value;if(!(await verifyPin(o))){alert('Wrong PIN');return;}if(!/^\d{4}$/.test(n)){alert('4 digits');return;}settings.pinHash=await sha(n);await saveSettings();alert('PIN changed');}
-async function forgotPin(){const c=prompt('Enter your recovery code:');if(!(await verifyRecovery(c))){alert('Wrong recovery code');return;}const n=prompt('New 4-digit PIN:');if(!/^\d{4}$/.test(n||'')){alert('PIN must be 4 digits');return;}settings.pinHash=await sha(n);await saveSettings();document.getElementById('pinLock').style.display='none';pinInput='';renderPin();}
-async function newRecovery(){if(!(await askPin('Enter PIN'))){alert('Wrong PIN');return;}const c=genCode();settings.recHash=await sha(c);await saveSettings();showRecovery(c);}
-async function exportData(){settings.lastBackup=Date.now();await saveSettings();const data={settings,borrowers,loans,installments,payments};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`pautang-${ymd(new Date())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);if(currentTab==='dashboard')render();}
-async function importData(e){const file=e.target.files[0];if(!file)return;if(!confirm('Replace all?'))return;const txt=await file.text();try{const d=JSON.parse(txt);if(d.settings)await idbPut('settings',d.settings);for(const s of ['borrowers','loans','installments','payments'])await idbClear(s);for(const b of (d.borrowers||[]))await idbPut('borrowers',b);for(const l of (d.loans||[]))await idbPut('loans',l);for(const i of (d.installments||[]))await idbPut('installments',i);for(const p of (d.payments||[]))await idbPut('payments',p);alert('Import OK');location.reload();}catch(err){alert('Invalid '+err.message)}}
-async function resetAll(){if(!(await askPin('Enter PIN to confirm:'))){alert('Wrong PIN');return;}if(!confirm('DELETE ALL?'))return;for(const x of ['borrowers','loans','installments','payments','settings'])await idbClear(x);location.reload();}
-document.getElementById('langSel').addEventListener('change',async e=>{lang=e.target.value;settings.lang=lang;await saveSettings();render();});
-// FIX KEYBOARD COVERING INPUTS ON MOBILE
-document.addEventListener('focusin', (e)=>{
-  if(e.target.classList && e.target.classList.contains('input')){
-    setTimeout(()=>{
-      e.target.scrollIntoView({behavior:'smooth',block:'center'});
-      const modal = document.querySelector('.modal');
-      if(modal){ modal.scrollTop = modal.scrollHeight; }
-    },300);
-  }
-});
-// Also handle visualViewport for Android keyboard
-if(window.visualViewport){
-  let lastHeight = window.visualViewport.height;
-  window.visualViewport.addEventListener('resize', ()=>{
-    const modal = document.querySelector('.modal');
-    if(!modal) return;
-    if(window.visualViewport.height < lastHeight){
-      // keyboard opened
-      setTimeout(()=>{ modal.style.maxHeight = (window.visualViewport.height - 20) + 'px'; modal.scrollTop = modal.scrollHeight; },100);
-    }else{
-      modal.style.maxHeight = '85dvh';
+(function () {
+  'use strict';
+
+  var state = {
+    name: '',
+    phone: '',
+    amount: '',
+    ref1: '4041 401',
+    ref2: '222597',
+    now: new Date(),
+    viewer: null
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  var esc = function (value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+
+  var pad = function (n) { return String(n).padStart(2, '0'); };
+
+  var dateText = function (d) {
+    return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()] +
+      ' ' + pad(d.getDate()) + ', ' + d.getFullYear();
+  };
+
+  var timeText = function (d) {
+    var h = d.getHours(), ap = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return h + ':' + pad(d.getMinutes()) + ' ' + ap;
+  };
+
+  var amountText = function (raw) {
+    var clean = String(raw || '').replace(/[^0-9.]/g, '');
+    var parts = clean.split('.');
+    var integer = (parts[0] || '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.length > 1 ? integer + '.' + parts[1].slice(0, 2) : integer;
+  };
+
+  var phoneText = function (raw) {
+    var value = String(raw || '');
+    if (value === '0') return '+63 ';
+    if (value.indexOf('0') === 0) value = '+63 ' + value.slice(1);
+    var prefix = '+63 ';
+    var digits = (value.indexOf(prefix) === 0 ? value.slice(prefix.length) : value)
+      .replace(/\D/g, '')
+      .slice(0, 10);
+    var pieces = [];
+    if (digits.length) pieces.push(digits.slice(0, 3));
+    if (digits.length > 3) pieces.push(digits.slice(3, 6));
+    if (digits.length > 6) pieces.push(digits.slice(6, 10));
+    return pieces.length ? prefix + pieces.join(' ') : prefix.trim();
+  };
+
+  var zigzag = function (w, depth, teeth, r) {
+    var half = w / (2 * teeth);
+    var diag = Math.sqrt(half * half + depth * depth);
+    var dx = r * half / diag;
+    var dy = r * depth / diag;
+    var p = function (n) { return Number(n.toFixed(2)); };
+    var d = 'M0 0 L' + w + ' 0 L' + w + ' ' + depth;
+    for (var i = 0; i < teeth; i++) {
+      var xt = w - half * (2 * i + 1);
+      var xv = w - half * (2 * i + 2);
+      d += ' L' + p(xt + dx) + ',' + p(dy) +
+           ' Q' + p(xt) + ',0 ' + p(xt - dx) + ',' + p(dy);
+      if (xv <= 0) {
+        d += ' L0,' + depth;
+      } else {
+        d += ' L' + p(xv + dx) + ',' + p(depth - dy) +
+             ' Q' + p(xv) + ',' + depth + ' ' + p(xv - dx) + ',' + p(depth - dy);
+      }
     }
-    lastHeight = window.visualViewport.height;
+    return d + ' Z';
+  };
+
+  var receiptMarkup = function () {
+    var displayName = state.name || 'CHIBEE';
+    var displayPhone = state.phone || '+63 000 000 0000';
+    var displayAmount = amountText(state.amount) || '0.00';
+    var ref = [state.ref1, state.ref2].filter(Boolean).join(' ') || '0000 000';
+
+    return '<div class="receipt">' +
+      '<div class="receipt-header">' +
+        '<div class="receipt-close-mark">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">' +
+            '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>' +
+          '</svg>' +
+        '</div>' +
+        '<span class="receipt-header-title">Express Send</span>' +
+      '</div>' +
+      '<div class="check-wrap">' +
+        '<div class="check-badge">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+            '<polyline points="20 6 9 17 4 12"/>' +
+          '</svg>' +
+        '</div>' +
+      '</div>' +
+      '<div class="receipt-card">' +
+        '<div class="recipient-name">' + esc(displayName) + '</div>' +
+        '<div class="phone-row"><div class="phone-pill">' + esc(displayPhone) + '</div></div>' +
+        '<div class="sent-via">Sent via GCash</div>' +
+        '<div class="divider"></div>' +
+        '<div class="amount-row"><span>Amount</span><span class="amount-value">' + esc(displayAmount) + '</span></div>' +
+        '<div class="divider"></div>' +
+        '<div class="total-row"><span>Total Amount Sent</span><span class="total-value">&#8369;' + esc(displayAmount) + '</span></div>' +
+        '<div class="receipt-lower">' +
+          '<div class="meta-row">' +
+            '<div class="ref-row"><span class="ref-label">Ref No.</span><span class="ref-value">' + esc(ref) + '</span></div>' +
+            '<div class="date-value">' + dateText(state.now) + ' ' + timeText(state.now) + '</div>' +
+          '</div>' +
+          '<div class="blank-area"></div>' +
+          '<div class="eco-card">' +
+            '<div class="eco-title">' +
+              '<svg viewBox="0 0 24 24" fill="#1B7C4F"><path d="M17 8C8 10 5.9 16.17 3.82 19.82L5.71 21l1-1.23A4.49 4.49 0 0 0 8 20C19 20 22 3 22 3c-1 2-8 5.5-8 5.5S16 4.5 17 8z"/></svg>' +
+              '<span>279g <span class="eco-unit">(gCO₂e)</span></span>' +
+            '</div>' +
+            '<p class="eco-copy">By going digital, you reduce your carbon footprint from transportation, paper, and plastic.</p>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="zigzag-wrap">' +
+        '<svg viewBox="0 0 390 12" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">' +
+          '<path d="' + zigzag(390, 12, 30, 4.5) + '" fill="#F0F4FF"/>' +
+        '</svg>' +
+      '</div>' +
+      '<div class="receipt-footer-space"></div>' +
+    '</div>';
+  };
+
+  var paintReceipt = function (target) {
+    target.innerHTML = receiptMarkup();
+  };
+
+  var updateSync = function () {
+    $('syncText').textContent = 'Time syncs automatically · ' + dateText(state.now) + ' ' + timeText(state.now);
+  };
+
+  var updatePreview = function () {
+    paintReceipt($('previewReceiptStage'));
+  };
+
+  var refresh = function () {
+    updateSync();
+    updatePreview();
+    if (state.viewer) {
+      paintReceipt(state.viewer.querySelector('.viewer-receipt-stage'));
+    }
+  };
+
+  var closeViewer = function () {
+    if (!state.viewer) return;
+    state.viewer.classList.add('closing');
+    window.setTimeout(function () {
+      if (state.viewer) {
+        state.viewer.remove();
+        state.viewer = null;
+      }
+    }, 340);
+  };
+
+  var openViewer = function () {
+    if (state.viewer) return;
+    var viewer = document.createElement('div');
+    viewer.className = 'viewer';
+    viewer.innerHTML =
+      '<div class="viewer-panel">' +
+        '<div class="viewer-toolbar"></div>' +
+        '<div class="viewer-receipt-stage"></div>' +
+      '</div>';
+
+    viewer.addEventListener('click', function (e) {
+      if (e.target === viewer) closeViewer();
+    });
+
+    document.body.appendChild(viewer);
+    state.viewer = viewer;
+    paintReceipt(viewer.querySelector('.viewer-receipt-stage'));
+  };
+
+  $('name').addEventListener('input', function (e) {
+    state.name = e.target.value.toUpperCase();
+    updatePreview();
+  });
+
+  $('phone').addEventListener('input', function (e) {
+    state.phone = phoneText(e.target.value);
+    e.target.value = state.phone;
+    updatePreview();
+  });
+
+  $('amount').addEventListener('input', function (e) {
+    state.amount = e.target.value;
+    updatePreview();
+  });
+
+  $('amount').addEventListener('blur', function (e) {
+    var n = parseFloat(String(e.target.value).replace(/,/g, ''));
+    if (!isNaN(n)) {
+      state.amount = n.toFixed(2);
+      e.target.value = state.amount;
+      updatePreview();
+    }
+  });
+
+  $('ref1').addEventListener('input', function (e) {
+    state.ref1 = e.target.value;
+    updatePreview();
+  });
+
+  $('ref2').addEventListener('input', function (e) {
+    state.ref2 = e.target.value;
+    updatePreview();
+  });
+
+  $('viewButton').addEventListener('click', openViewer);
+
+  window.setInterval(function () {
+    state.now = new Date();
+    updateSync();
+    updatePreview();
+    if (state.viewer) {
+      paintReceipt(state.viewer.querySelector('.viewer-receipt-stage'));
+    }
+  }, 60000);
+
+  refresh();
+}());
+</script>
+
+<script>
+// PWA Register - GitHub Pages ready
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js', {scope: './'}).then(function(reg){
+      console.log('SW registered', reg.scope);
+    }).catch(function(e){ console.log('SW fail', e); });
   });
 }
-let _dip=null,_hid=0;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_dip=e;const b=document.getElementById('installBtn');if(b)b.style.display='block'});
-function installApp(){if(_dip){_dip.prompt();_dip=null;const b=document.getElementById('installBtn');if(b)b.style.display='none'}}
-function toast(m,f){const d=document.createElement('div');d.className='toast';d.textContent=m;d.onclick=()=>{if(f)f();d.remove()};document.body.appendChild(d)}
-if('serviceWorker' in navigator){const hadCtl=!!navigator.serviceWorker.controller;navigator.serviceWorker.register('./sw.js').then(r=>r.addEventListener('updatefound',()=>{const w=r.installing;if(w)w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)toast('Update ready - tap to refresh',()=>w.postMessage('skip'))})})).catch(()=>{});let rl=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(rl||!hadCtl)return;rl=true;location.reload()})}
-document.addEventListener('visibilitychange',()=>{if(document.hidden)_hid=Date.now();else if(_hid&&Date.now()-_hid>60000&&settings.lenderName)lockApp()});
-initKeypad();loadAll();
-</script></body>
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
 </html>
