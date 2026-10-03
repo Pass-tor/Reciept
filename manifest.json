@@ -1,21 +1,30 @@
 {
-  "name": "Pautang - Offline Loan Manager",
-  "short_name": "Pautang",
+  "name": "GCash Express Send Receipt",
+  "short_name": "GCash Receipt",
+  "description": "GCash Express Send Receipt Generator - PWA Ready",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay"
+  ],
   "orientation": "portrait",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "background_color": "#F0F4FF",
+  "theme_color": "#1B5EE3",
+  "categories": [
+    "finance",
+    "utilities"
+  ],
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
